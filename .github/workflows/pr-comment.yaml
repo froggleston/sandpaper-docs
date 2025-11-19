@@ -77,8 +77,10 @@ jobs:
       - name: "Skip checks for Workbench version file updates"
         if: steps.changed-files.outputs.only_version_file == 'true'
         run: |
-          echo "Only workbench-docker-version.txt changed, skipping preflight checks"
+          echo "Only workbench-docker-version.txt changed, skipping preflight checks and running cache update"
+          gh workflow run update-cache.yaml --ref main
           exit 0
+        shell: bash
 
       - name: "Get Invalid Hashes File"
         id: hash
