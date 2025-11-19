@@ -77,6 +77,8 @@ jobs:
 
       - name: "Skip checks for Workbench version file updates"
         if: steps.changed-files.outputs.only_version_file == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Only workbench-docker-version.txt changed, skipping preflight checks and running cache update"
           gh workflow run update-cache.yaml --ref main
