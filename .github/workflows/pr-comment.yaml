@@ -69,7 +69,7 @@ jobs:
           DOCKER_VER_FILE=$(echo "$FILES" | grep "^\.github/workbench-docker-version.txt$")
 
           # Check if only workbench-docker-version.txt changed
-          if [ "$FILE_COUNT" -eq 1 ] && [ "$DOCKER_VER_FILE" -ne "" ]; then
+          if [[ "$FILE_COUNT" -eq 1 && "$DOCKER_VER_FILE" != "" ]]; then
             echo "only_version_file=true" >> $GITHUB_OUTPUT
           else
             echo "only_version_file=false" >> $GITHUB_OUTPUT
