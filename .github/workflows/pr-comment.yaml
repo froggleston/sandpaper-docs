@@ -66,9 +66,10 @@ jobs:
           ## Get list of changed files in the PR ##
           FILES=$(gh pr view ${{ steps.get-pr.outputs.NUM }} --json files --jq '.files[].path')
           FILE_COUNT=$(echo "$FILES" | wc -l)
+          DOCKER_VER_FILE=$(echo "$FILES" | grep "^\.github/workbench-docker-version.txt$")
 
-          # Check if only docker-version.txt changed
-          if [ "$FILE_COUNT" -eq 1 ] && echo "$FILES" | grep -q "^workbench-docker-version\.txt$"; then
+          # Check if only workbench-docker-version.txt changed
+          if [ "$FILE_COUNT" -eq 1 ] && [ "$DOCKER_VER_FILE" -ne "" ]; then
             echo "only_version_file=true" >> $GITHUB_OUTPUT
           else
             echo "only_version_file=false" >> $GITHUB_OUTPUT
