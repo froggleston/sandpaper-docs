@@ -190,8 +190,9 @@ jobs:
   trigger-build-deploy:
     name: "Trigger Build and Deploy Workflow"
     runs-on: ubuntu-latest
-    needs: [check-renv, update-renv-cache]
-    if: needs.update-renv-cache.outcome == 'success'
+    needs: update-renv-cache
+    if: |
+      needs.update-renv-cache.result == 'success'
     steps:
       - name: "Trigger Build and Deploy Workflow"
         env:
