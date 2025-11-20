@@ -158,7 +158,10 @@ jobs:
 
       - name: "Configure AWS credentials via OIDC"
         id: aws-creds
-        if: steps.validate-org-workflow.outputs.is_valid == 'true'
+        if: |
+          steps.validate-org-workflow.outputs.is_valid == 'true' &&
+          secrets.AWS_GH_OIDC_ARN != '' &&
+          secrets.AWS_GH_OIDC_REGION != ''
         uses: aws-actions/configure-aws-credentials@v5.0.0
         with:
           role-to-assume: ${{ secrets.AWS_GH_OIDC_ARN }}

@@ -197,7 +197,9 @@ jobs:
         id: aws-creds
         if: |
           steps.validate-org-workflow.outputs.is_valid == 'true' &&
-          needs.check-renv.outputs.renv-needed == 'true'
+          needs.check-renv.outputs.renv-needed == 'true' &&
+          secrets.AWS_GH_OIDC_ARN != '' &&
+          secrets.AWS_GH_OIDC_REGION != ''
         uses: aws-actions/configure-aws-credentials@v5.0.0
         with:
           role-to-assume: ${{ secrets.AWS_GH_OIDC_ARN }}

@@ -35,14 +35,21 @@ jobs:
           workflow: ${{ github.workflow }}
 
       - name: Configure AWS credentials via OIDC
-        if: ${{ steps.validate-org-workflow.outputs.is_valid == 'true' }}
-        uses: aws-actions/configure-aws-credentials@v4.1.0
+        if: |
+          steps.validate-org-workflow.outputs.is_valid == 'true' &&
+          secrets.AWS_GH_OIDC_ARN != '' &&
+          secrets.AWS_GH_OIDC_REGION != ''
+        uses: aws-actions/configure-aws-credentials@v5.0.0
         with:
           role-to-assume: ${{ secrets.AWS_GH_OIDC_ARN }}
           aws-region: ${{ secrets.AWS_GH_OIDC_REGION }}
 
       - name: Set PAT from AWS Secrets Manager
         id: set-pat
+        if: |
+          steps.validate-org-workflow.outputs.is_valid == 'true' &&
+          secrets.AWS_GH_OIDC_ARN != '' &&
+          secrets.AWS_GH_OIDC_REGION != ''
         run: |
           SECRET=$(aws secretsmanager get-secret-value \
                    --secret-id carpentries-bot/github-pat \

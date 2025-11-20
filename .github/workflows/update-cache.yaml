@@ -115,14 +115,20 @@ jobs:
           workflow: ${{ github.workflow }}
 
       - name: "Configure AWS credentials via OIDC"
-        if: steps.validate-org-workflow.outputs.is_valid == 'true'
+        if: |
+          steps.validate-org-workflow.outputs.is_valid == 'true' &&
+          secrets.AWS_GH_OIDC_ARN != '' &&
+          secrets.AWS_GH_OIDC_REGION != ''
         uses: aws-actions/configure-aws-credentials@v5.0.0
         with:
           role-to-assume: ${{ secrets.AWS_GH_OIDC_ARN }}
           aws-region: ${{ secrets.AWS_GH_OIDC_REGION }}
 
       - name: "Set PAT from AWS Secrets Manager"
-        if: steps.validate-org-workflow.outputs.is_valid == 'true'
+        if: |
+          steps.validate-org-workflow.outputs.is_valid == 'true' &&
+          secrets.AWS_GH_OIDC_ARN != '' &&
+          secrets.AWS_GH_OIDC_REGION != ''
         id: set-pat
         run: |
           SECRET=$(aws secretsmanager get-secret-value \
@@ -137,7 +143,7 @@ jobs:
         id: validate-token
         uses: carpentries/actions/check-valid-credentials@main
         with:
-          token: ${{ steps.set-pat.outputs.pat || secrets.SANDPAPER_WORKFLOW }}
+          token: ${{ steps.set-pat.outputs.pat || secrets.SANDPAPER_WORKFLOW || secrets.GITHUB_TOKEN }}
 
       # Create the PR with the following roles in order of preference:
       # - Carpentries Bot classic PAT fetched from AWS (will only work in official Carpentries repos)
