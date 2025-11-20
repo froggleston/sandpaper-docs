@@ -194,6 +194,8 @@ jobs:
     if: |
       needs.update-renv-cache.result == 'success'
     steps:
+      - uses: actions/checkout@v4
+
       - name: "Trigger Build and Deploy Workflow"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
