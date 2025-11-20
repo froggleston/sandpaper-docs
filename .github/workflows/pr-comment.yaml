@@ -64,12 +64,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ## Get list of changed files in the PR ##
-          FILES=$(gh pr view ${{ steps.get-pr.outputs.NUM }} --json files --jq '.files[].path')
-          FILE_COUNT=$(echo "$FILES" | wc -l)
-          DOCKER_VER_FILE=$(echo "$FILES" | grep "^\.github/workbench-docker-version\.txt$")
+          ONLY_VERSION=$(gh pr view 10 --json files --jq '
+            .files |
+            length == 1 and
+            .[0].path == ".github/workbench-docker-version.txt"
+          ')
 
-          # Check if only workbench-docker-version.txt changed
-          if [[ "$FILE_COUNT" -eq 1 && "$DOCKER_VER_FILE" != "" ]]; then
+          if [[ "$ONLY_VERSION" == "true" ]]; then
             echo "only_version_file=true" >> $GITHUB_OUTPUT
           else
             echo "only_version_file=false" >> $GITHUB_OUTPUT
