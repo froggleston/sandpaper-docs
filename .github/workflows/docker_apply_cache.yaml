@@ -158,14 +158,17 @@ jobs:
 
       - name: "Configure AWS credentials via OIDC"
         id: aws-creds
-        if: |
-          steps.validate-org-workflow.outputs.is_valid == 'true' &&
-          secrets.AWS_GH_OIDC_ARN != '' &&
-          secrets.AWS_GH_OIDC_REGION != ''
-        uses: aws-actions/configure-aws-credentials@v5.0.0
-        with:
+        env:
           role-to-assume: ${{ secrets.AWS_GH_OIDC_ARN }}
           aws-region: ${{ secrets.AWS_GH_OIDC_REGION }}
+        if: |
+          steps.validate-org-workflow.outputs.is_valid == 'true' &&
+          env.role-to-assume != '' &&
+          env.aws-region != ''
+        uses: aws-actions/configure-aws-credentials@v5.0.0
+        with:
+          role-to-assume: ${{ env.role-to-assume }}
+          aws-region: ${{ env.aws-region }}
           output-credentials: true
 
       - name: "Upload cache object to S3"

@@ -115,20 +115,26 @@ jobs:
           workflow: ${{ github.workflow }}
 
       - name: "Configure AWS credentials via OIDC"
-        if: |
-          steps.validate-org-workflow.outputs.is_valid == 'true' &&
-          secrets.AWS_GH_OIDC_ARN != '' &&
-          secrets.AWS_GH_OIDC_REGION != ''
-        uses: aws-actions/configure-aws-credentials@v5.0.0
-        with:
+        env:
           role-to-assume: ${{ secrets.AWS_GH_OIDC_ARN }}
           aws-region: ${{ secrets.AWS_GH_OIDC_REGION }}
-
-      - name: "Set PAT from AWS Secrets Manager"
         if: |
           steps.validate-org-workflow.outputs.is_valid == 'true' &&
-          secrets.AWS_GH_OIDC_ARN != '' &&
-          secrets.AWS_GH_OIDC_REGION != ''
+          env.role-to-assume != '' &&
+          env.aws-region != ''
+        uses: aws-actions/configure-aws-credentials@v5.0.0
+        with:
+          role-to-assume: ${{ env.role-to-assume }}
+          aws-region: ${{ env.aws-region }}
+
+      - name: "Set PAT from AWS Secrets Manager"
+        env:
+          role-to-assume: ${{ secrets.AWS_GH_OIDC_ARN }}
+          aws-region: ${{ secrets.AWS_GH_OIDC_REGION }}
+        if: |
+          steps.validate-org-workflow.outputs.is_valid == 'true' &&
+          env.role-to-assume != '' &&
+          env.aws-region != ''
         id: set-pat
         run: |
           SECRET=$(aws secretsmanager get-secret-value \
